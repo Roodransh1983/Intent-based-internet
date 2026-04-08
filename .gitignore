@@ -1,0 +1,19 @@
+.DS_Store
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+backend/venv/
+
+# Local environment files
+.env
+.env.*
+backend/.env
+
+# Frontend package artifacts
+node_modules/
+dist/
+build/
