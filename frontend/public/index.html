@@ -3,22 +3,426 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4F46E5">
-  <meta name="description" content="Intent-Based Internet - Transform intentions into actionable plans">
+  <meta name="theme-color" content="#113cfc">
+  <meta name="description" content="Intent-Based Internet turns your goals into structured, AI-guided action plans you can track online or offline.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="IntentNet">
+  <meta property="og:title" content="Intent-Based Internet">
+  <meta property="og:description" content="Transform intentions into practical roadmaps, milestones, and tasks.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23113cfc'/%3E%3Cpath d='M37 36h54v10H37zm0 23h38v10H37zm0 23h54v10H37z' fill='white'/%3E%3Ccircle cx='92' cy='61' r='11' fill='%23ffd166'/%3E%3C/svg%3E">
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/src/styles.css">
   <title>Intent-Based Internet</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    :root {
+      --shell-bg: #081225;
+      --shell-panel: rgba(9, 18, 38, 0.72);
+      --shell-border: rgba(255, 255, 255, 0.12);
+      --shell-text: #f8fbff;
+      --shell-muted: rgba(232, 240, 255, 0.74);
+      --shell-accent: #113cfc;
+      --shell-accent-soft: #7aa2ff;
+      --shell-highlight: #ffd166;
+      --shell-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      --shell-font: "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(122, 162, 255, 0.28), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(17, 60, 252, 0.22), transparent 30%),
+        linear-gradient(160deg, #050b17 0%, #081225 38%, #0b1732 100%);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: var(--shell-font);
+      color: var(--shell-text);
+      background: transparent;
+    }
+
+    .app-shell {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 32px 20px;
+      display: grid;
+      place-items: center;
+    }
+
+    .app-shell::before,
+    .app-shell::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(10px);
+    }
+
+    .app-shell::before {
+      width: 240px;
+      height: 240px;
+      top: 7%;
+      right: -80px;
+      background: rgba(122, 162, 255, 0.2);
+    }
+
+    .app-shell::after {
+      width: 320px;
+      height: 320px;
+      bottom: -120px;
+      left: -120px;
+      background: rgba(255, 209, 102, 0.11);
+    }
+
+    .shell-card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1080px);
+      border: 1px solid var(--shell-border);
+      border-radius: 28px;
+      background: var(--shell-panel);
+      box-shadow: var(--shell-shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .shell-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(145deg, var(--shell-accent) 0%, #4c7bff 100%);
+      box-shadow: 0 14px 30px rgba(17, 60, 252, 0.35);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 0.98rem;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-copy span {
+      display: block;
+      color: var(--shell-muted);
+      font-size: 0.8rem;
+    }
+
+    .shell-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--shell-muted);
+      font-size: 0.86rem;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--shell-highlight);
+      box-shadow: 0 0 0 8px rgba(255, 209, 102, 0.12);
+      animation: shell-pulse 1.8s infinite ease-in-out;
+    }
+
+    .shell-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 0;
+    }
+
+    .shell-copy,
+    .shell-preview {
+      padding: 34px 24px;
+    }
+
+    .shell-copy {
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shell-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      color: var(--shell-accent-soft);
+      background: rgba(122, 162, 255, 0.1);
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .shell-copy h1 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(2.3rem, 6vw, 4.3rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .shell-copy p {
+      margin: 18px 0 0;
+      max-width: 56ch;
+      color: var(--shell-muted);
+      font-size: 1.02rem;
+      line-height: 1.75;
+    }
+
+    .shell-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .shell-point {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .shell-point strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .shell-point span {
+      color: var(--shell-muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .shell-preview {
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 35%),
+        rgba(255, 255, 255, 0.01);
+    }
+
+    .preview-card {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .preview-card strong {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 0.92rem;
+      color: #ffffff;
+    }
+
+    .progress-lines {
+      display: grid;
+      gap: 10px;
+    }
+
+    .progress-lines span {
+      display: block;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-lines span::after {
+      content: "";
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7aa2ff 0%, #113cfc 100%);
+      transform-origin: left center;
+      animation: shell-load 2s ease-in-out infinite alternate;
+    }
+
+    .progress-lines span:nth-child(1)::after { width: 88%; }
+    .progress-lines span:nth-child(2)::after { width: 64%; animation-delay: 0.12s; }
+    .progress-lines span:nth-child(3)::after { width: 76%; animation-delay: 0.24s; }
+
+    .shell-note {
+      color: var(--shell-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .noscript-note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      color: #ffe3e3;
+      background: rgba(186, 31, 61, 0.18);
+      border: 1px solid rgba(255, 142, 163, 0.22);
+      font-size: 0.92rem;
+    }
+
+    @keyframes shell-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.82; }
+    }
+
+    @keyframes shell-load {
+      from { transform: scaleX(0.92); }
+      to { transform: scaleX(1); }
+    }
+
+    @media (max-width: 860px) {
+      .shell-content {
+        grid-template-columns: 1fr;
+      }
+
+      .shell-copy {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .shell-points {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app-shell {
+        padding: 16px;
+      }
+
+      .shell-topbar,
+      .shell-copy,
+      .shell-preview {
+        padding: 20px 18px;
+      }
+
+      .shell-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .shell-copy h1 {
+        max-width: none;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <main class="app-shell" aria-label="Application loading experience">
+      <section class="shell-card">
+        <div class="shell-topbar">
+          <div class="brand">
+            <div class="brand-mark">IN</div>
+            <div class="brand-copy">
+              <strong>IntentNet</strong>
+              <span>AI-guided planning workspace</span>
+            </div>
+          </div>
+          <div class="shell-status">
+            <span class="status-dot" aria-hidden="true"></span>
+            Preparing your workspace
+          </div>
+        </div>
+
+        <div class="shell-content">
+          <div class="shell-copy">
+            <div class="shell-eyebrow">Intent to Execution</div>
+            <h1>Build focused plans from a single goal.</h1>
+            <p>
+              Turn an idea into milestones, tasks, and measurable progress with a workspace that stays usable online or offline.
+            </p>
+
+            <div class="shell-points" aria-hidden="true">
+              <div class="shell-point">
+                <strong>Structured Roadmaps</strong>
+                <span>Goals become milestones and action steps automatically.</span>
+              </div>
+              <div class="shell-point">
+                <strong>Offline Ready</strong>
+                <span>Your work is stored locally and synced when connectivity returns.</span>
+              </div>
+              <div class="shell-point">
+                <strong>Progress Clarity</strong>
+                <span>Track completion and momentum from one clean dashboard.</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="shell-preview" aria-hidden="true">
+            <div class="preview-card">
+              <strong>Loading goal workspace</strong>
+              <div class="progress-lines">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="preview-card shell-note">
+              Aligning your application shell, restoring local state, and preparing the planner.
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <noscript>
+    <div class="app-shell">
+      <section class="shell-card">
+        <div class="shell-copy">
+          <div class="shell-eyebrow">JavaScript Required</div>
+          <h1>IntentNet needs JavaScript to run.</h1>
+          <p>Enable JavaScript in your browser to load the app, sync data, and use the AI planning experience.</p>
+          <div class="noscript-note">This application is a JavaScript-powered web app and cannot render the main workspace without it.</div>
+        </div>
+      </section>
+    </div>
+  </noscript>
+
   <script src="/src/app.js" type="module"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
     }
   </script>
 </body>
